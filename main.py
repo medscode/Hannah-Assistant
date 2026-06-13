@@ -1,5 +1,7 @@
 # 
 
+from tkinter import Image
+
 import pyttsx3
 import speech_recognition as sr
 import random
@@ -21,15 +23,15 @@ voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
 engine.setProperty("rate", 150)
     
-def speak(audio):
+def speak(audio: str) -> None:
     engine.say(audio)
     engine.runAndWait()
 
-def command():
-    content = ""
+def command() -> str:
+    content: str = ""
     while content == "":
 
-        r = sr.Recognizer()
+        r: sr.Recognizer = sr.Recognizer()
 
         try:
             with sr.Microphone() as source:
@@ -63,12 +65,12 @@ def command():
             continue
 
     
-def main_process():
+def main_process() -> None:
 
     speak("Hi, I am Hannah. How can I help you today?")
 
     while True:
-        request = command().lower()
+        request: str = command().lower()
 
         if request == "terminate":
             break
@@ -82,7 +84,7 @@ def main_process():
 
         elif "play music" in request:
             speak("Playing music")
-            song = random.randint(1, 3)
+            song: int = random.randint(1, 3)
             if song == 1:
                 webbrowser.open("https://www.youtube.com/watch?v=6KKs0QGGe-0&t=242s")
             elif song == 2:
@@ -91,15 +93,15 @@ def main_process():
                 webbrowser.open("https://www.youtube.com/watch?v=6KKs0QGGe-0&t=242s")
         
         elif "say time" in request:
-            now_time = datetime.datetime.now().strftime("%H:%M")
-            speak("Current time is " + str(now_time))
+            now_time: str = datetime.datetime.now().strftime("%H:%M")
+            speak("Current time is " + now_time)
         
         elif "say date" in request:
-            now_time = datetime.datetime.now().strftime("%d:%m")
-            speak("Current date is " + str(now_time))
+            now_date: str = datetime.datetime.now().strftime("%d:%m")
+            speak("Current date is " + now_date)
 
         elif "new task" in request:
-            task = request.replace("new task", "")
+            task: str = request.replace("new task", "")
             task = task.strip()
             if task != "":
                 speak("Adding task : " + task)
@@ -112,7 +114,7 @@ def main_process():
 
         elif "show work" in request:
             with open("todo.txt", "r") as file:
-                tasks = file.read()
+                tasks: str = file.read()
             notification.notify(
                 title = "Today's work",
                 message = tasks
@@ -125,20 +127,20 @@ def main_process():
             webbrowser.open("www.instagram.com")  
 
         elif "open" in request:
-            query = request.replace("open", "")
+            query: str = request.replace("open", "")
             pyautogui.press("super")
             pyautogui.typewrite(query)
             pyautogui.sleep(2)
             pyautogui.press("enter")
 
-            im1 = pyautogui.screenshot()
+            im1: Image.Image = pyautogui.screenshot()
             im1.save('my_screenshot.png')
-            im2 = pyautogui.screenshot('my_screenshot2.png')
+            im2: Image.Image = pyautogui.screenshot('my_screenshot2.png')
 
         elif "wikipedia" in request:
             request = request.replace("Hannah", "")
             request = request.replace("search wikipedia", "")
-            result = wikipedia.summary(request, sentences = 2)
+            result: str = wikipedia.summary(request, sentences = 2)
             speak(result)        
 
         elif "search google" in request:
