@@ -11,6 +11,8 @@ import wikipedia
 import pywhatkit as pwk
 import user_config
 import smtplib, ssl
+import openai_request as gpt
+
 
 
 
@@ -24,39 +26,41 @@ def speak(audio):
     engine.runAndWait()
 
 def command():
+    content = ""
+    while content == "":
 
-    r = sr.Recognizer()
-
-    try:
-        with sr.Microphone() as source:
-            print("Listening...")
-            audio = r.listen(source, timeout=10)
-
-        content = r.recognize_google(audio, language='en-in')
-        print("You Said............" + content)
-        return content
-
-    except sr.WaitTimeoutError:
-        
-        print("Say something")
-        speak("Say something")
+        r = sr.Recognizer()
 
         try:
             with sr.Microphone() as source:
-                audio = r.listen(source, timeout=20)
+                print("Listening...")
+                audio = r.listen(source, timeout=10)
 
             content = r.recognize_google(audio, language='en-in')
             print("You Said............" + content)
             return content
 
         except sr.WaitTimeoutError:
-            print("Second timeout")
-            speak("No input detected. Session terminated.")
-            return "terminate"
+            
+            print("Say something")
+            speak("Say something")
 
-    except Exception:
-        print("Please try again...")
-        return ""
+            try:
+                with sr.Microphone() as source:
+                    audio = r.listen(source, timeout=20)
+
+                content = r.recognize_google(audio, language='en-in')
+                print("You Said............" + content)
+                return content
+
+            except sr.WaitTimeoutError:
+                print("Second timeout")
+                speak("No input detected. Session terminated.")
+                return "terminate"
+
+        except Exception:
+            print("Please try again...")
+            continue
 
     
 def main_process():
@@ -74,7 +78,7 @@ def main_process():
             break
 
         elif "hello" in request:
-            speak("Welcome, How can i help you.")
+            speak("Hi, How can i help you.")
 
         elif "play music" in request:
             speak("Playing music")
@@ -143,19 +147,57 @@ def main_process():
             webbrowser.open("https://www.google.com/search?q="+request)
 
         elif "send whatsapp" in request:
-            pwk.sendwhatmsg("+919971183842", "Hi, How are you?", 2, 37, 20, True, 2)
+            pwk.sendwhatmsg("+91xxxx2", "Hi, How are you?", 2, 37, 20, True, 2)
+
+
 
         elif "send email" in request:
-            s = smtplib.SMTP('smtp.gmail.com', 587)
-            s.starttls()
-            s.login("medhavee.gemini@gmail.com", user_config.gmail_pass)
-            message = "Subject: Greeting\n\nHi, Hope you are doing well!\nThis is a test email sent by Hannah.\nThanks"
-            s.sendmail("medhavee.gemini@gmail.com", "medscodes@gmail.com", message)
-            s.quit()
-            speak("Email sent")
-            
-if __name__ == "__main__":
-    try:
-        main_process()
-    finally:
-        engine.stop()
+
+            try:
+                s = smtplib.SMTP('smtp.gmail.com', 587)
+                s.starttls()
+
+                s.login(
+                    "medhavee.gemini@gmail.com",
+                    user_config.gmail_pass
+)
+
+                message = (
+                    "Subject: Greeting\n\n"
+                    "Hi, Hope you are doing well!\n"
+                    "This is a test email sent by Hannah.\n"
+                    "Thanks"
+                )
+
+                s.sendmail(
+                    "medhavee.gemini@gmail.com",
+                    "medscodes@gmail.com",
+                    message
+                )
+
+                s.quit()
+                print("Email sent")
+
+            except Exception as e:
+                print("Email failed:", e)
+      
+
+        # elif "ask gpt" in request:
+        #     request = request.replace("Hannah", "")
+        #     request = request.replace("ask gpt", "")
+        #     print("Request to GPT: " + request)
+        #     response = gpt.ask_gpt(request)
+        #     print("GPT Response: " + response)
+        #     speak(response)
+
+        # else ask ai in request:
+        #     request = request.replace("Hannah", "")
+        #     request = request.replace("ask ai", "")
+        #     print("Request to GPT: " + request)
+        #     response = gpt.ask_gpt(request)
+        #     print("GPT Response: " + response)
+        #     speak(response)
+
+
+
+main_process()
